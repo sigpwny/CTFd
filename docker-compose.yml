@@ -11,7 +11,7 @@ services:
       - UPLOAD_FOLDER=/var/uploads
       - DATABASE_URL=mysql+pymysql://ctfd:ctfd@db/ctfd
       - REDIS_URL=redis://cache:6379
-      - WORKERS=1
+      - WORKERS=8
       - LOG_FOLDER=/var/log/CTFd
       - ACCESS_LOG=-
       - ERROR_LOG=-
@@ -33,8 +33,13 @@ services:
     restart: always
     volumes:
       - ./conf/nginx/http.conf:/etc/nginx/nginx.conf
+      - ./conf/nginx/cert.pem:/etc/nginx/cert.pem
+      - ./conf/nginx/key.pem:/etc/nginx/key.pem
+      - ./sslkeys:/etc/ssl:ro
+      - ./logs:/etc/nginx/logs
     ports:
       - 80:80
+      - 443:443
     depends_on:
       - ctfd
 
