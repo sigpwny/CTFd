@@ -22,6 +22,7 @@ services:
       - .data/CTFd/logs:/var/log/CTFd
       - .data/CTFd/uploads:/var/uploads
       - .:/opt/CTFd:ro
+      - ./CTFd/themes:/opt/CTFd/CTFd/themes # Allow theme dev in container
     depends_on:
       - db
     networks:

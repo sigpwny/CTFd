@@ -33,8 +33,12 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         libffi8 \
         libssl3 \
+        curl \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
+
+# Install yarn
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash && . /root/.bashrc && nvm install 22 && npm i -g yarn
 
 COPY --chown=1001:1001 . /opt/CTFd
 

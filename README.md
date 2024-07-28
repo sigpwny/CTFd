@@ -41,6 +41,15 @@ Do not push sensitive config variables! Use a `.env` file in the root of the fol
 
 + To add the sigpwny-challenge-store to your local copy, follow the section [Testing CTFd Locally](https://github.com/sigpwny/sigpwny-challenge-store#testing-ctfd-locally).
 
+Then,
+
+```bash
+docker-compose up
+# docker-compose up --build to rebuild
+# docker ps to check containers
+# docker exec -it ctfd-ctfd-1 /bin/bash to enter the main container
+```
+
 ## SSL Keys
 
 How to update SSL certs:
