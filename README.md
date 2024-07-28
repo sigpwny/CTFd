@@ -5,6 +5,64 @@
 [![MajorLeagueCyber Discourse](https://img.shields.io/discourse/status?server=https%3A%2F%2Fcommunity.majorleaguecyber.org%2F)](https://community.majorleaguecyber.org/)
 [![Documentation Status](https://api.netlify.com/api/v1/badges/6d10883a-77bb-45c1-a003-22ce1284190e/deploy-status)](https://docs.ctfd.io)
 
+## Updating theme and plugins
+
+```sh
+git submodule update --remote --merge
+git add CTFd # Make sure you don't commit your dev docker-compose.yml
+git commit -m "Update submodules" && git push
+```
+
+# SIGPwny Note
+
+Do not push sensitive config variables! Use a `.env` file in the root of the folder instead. See `.env.example`
+
+## SIGPwny Testing locally
+
++ Run `git submodule init && git submodule update`
++ Set `DISCORD_WEBHOOK_URL=` after you copy `.env.example` to `.env.`
++ Turn off nginx SSL (copy this section to the `docker-compose.yml`)
+```yml
+  nginx:
+    image: nginx:stable
+    restart: always
+    volumes:
+      - ./conf/nginx/original-http.conf:/etc/nginx/nginx.conf
+      # - ./conf/nginx/cert.pem:/etc/nginx/cert.pem
+      # - ./conf/nginx/key.pem:/etc/nginx/key.pem
+      # - ./sslkeys:/etc/ssl:ro
+      # - ./logs:/etc/nginx/logs
+    ports:
+      - 80:80
+      # - 443:443
+    depends_on:
+      - ctfd
+```
+
++ To add the sigpwny-challenge-store to your local copy, follow the section [Testing CTFd Locally](https://github.com/sigpwny/sigpwny-challenge-store#testing-ctfd-locally).
+
+## SSL Keys
+
+How to update SSL certs:
+
+docker run -p 80:80 --volume="/home/ctfd/CTFd/sslkeys:/sslkeys:rw" -it ubuntu:latest bash
+apt-get update
+apt-get install certbot
+y
+2
+37
+certbot certonly
+1
+sigpwny@gmail.com
+A
+N
+ctf.sigpwny.com
+cp /etc/letsencrypt/archive/ctf.sigpwny.com/* /sslkeys
+exit
+sudo chown ctfd:ctfd -R sslkeys
+
+The four .pem files should appear here. If they're differently named, edit the nginx conf.
+
 ## What is CTFd?
 
 CTFd is a Capture The Flag framework focusing on ease of use and customizability. It comes with everything you need to run a CTF and it's easy to customize with plugins and themes.

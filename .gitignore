@@ -80,3 +80,8 @@ node_modules/
 
 # Flask Profiler files
 flask_profiler.sql
+
+# Secret keys
+.env
+id_rsa
+*.pem
