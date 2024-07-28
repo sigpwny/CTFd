@@ -1,0 +1,12 @@
+[submodule "CTFd/themes/sigpwny-core-beta"]
+	path = CTFd/themes/sigpwny-core-beta
+	url = git@github.com:sigpwny/sigpwny-core-beta.git
+[submodule "CTFd/plugins/CTFd-Discord-Integration"]
+	path = CTFd/plugins/CTFd-Discord-Integration
+	url = git@github.com:sigpwny/CTFd-Discord-Integration.git
+[submodule "CTFd/plugins/ctfd-discord-webhook-plugin"]
+	path = CTFd/plugins/ctfd-discord-webhook-plugin
+	url = git@github.com:sigpwny/ctfd-discord-webhook-plugin.git
+[submodule "CTFd/plugins/ctfd-cryptohack-plugin"]
+	path = CTFd/plugins/ctfd-cryptohack-plugin
+	url = git@github.com:sigpwny/ctfd-cryptohack-plugin.git
