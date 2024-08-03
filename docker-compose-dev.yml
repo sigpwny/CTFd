@@ -19,9 +19,7 @@ services:
     volumes:
       - .data/CTFd/logs:/var/log/CTFd
       - .data/CTFd/uploads:/var/uploads
-      - .:/opt/CTFd:ro
-      - ./CTFd/themes:/opt/CTFd/CTFd/themes # Allow theme dev in container
-      - ./CTFd/themes:/opt/CTFd/CTFd/plugins # Allow theme dev in container
+      - .:/opt/CTFd # Mount as RW for testing
     depends_on:
       - db
     networks:
