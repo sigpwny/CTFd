@@ -20,6 +20,8 @@ services:
       - .data/CTFd/logs:/var/log/CTFd
       - .data/CTFd/uploads:/var/uploads
       - .:/opt/CTFd:ro
+      - ./CTFd/themes:/opt/CTFd/CTFd/themes # Allow theme dev in container
+      - ./CTFd/themes:/opt/CTFd/CTFd/plugins # Allow theme dev in container
     depends_on:
       - db
     networks:
@@ -30,14 +32,9 @@ services:
     image: nginx:stable
     restart: always
     volumes:
-      - ./conf/nginx/http.conf:/etc/nginx/nginx.conf
-      - ./conf/nginx/cert.pem:/etc/nginx/cert.pem
-      - ./conf/nginx/key.pem:/etc/nginx/key.pem
-      - ./sslkeys:/etc/ssl:ro
-      - ./logs:/etc/nginx/logs
+      - ./conf/nginx/original-http.conf:/etc/nginx/nginx.conf
     ports:
       - 80:80
-      - 443:443
     depends_on:
       - ctfd
 
