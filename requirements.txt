@@ -39,7 +39,7 @@ click==7.1.2
     # via flask
 cmarkgfm==2022.10.27
     # via -r requirements.in
-cryptography==40.0.2
+cryptography==43.0.1
     # via pymysql
 dataset==1.6.2
     # via -r requirements.in
@@ -122,7 +122,9 @@ pycparser==2.20
 pydantic==1.6.2
     # via -r requirements.in
 pymysql[rsa]==1.0.2
-    # via -r requirements.in
+    # via
+    #   -r requirements.in
+    #   pymysql
 pyrsistent==0.17.3
     # via jsonschema
 python-dateutil==2.8.1
