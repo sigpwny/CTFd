@@ -19,6 +19,10 @@ Do not push sensitive config variables! Use a `.env` file in the root of the fol
 
 ## SIGPwny Testing locally
 
+```bash
+git clone --recurse-submodules -j8 git@github.com:sigpwny/CTFd.git
+```
+
 + Run `git submodule init && git submodule update`
 + Set `DISCORD_WEBHOOK_URL=` after you copy `.env.example` to `.env.`
 + Turn off nginx SSL (copy this section to the `docker-compose.yml`)
@@ -71,6 +75,14 @@ exit
 sudo chown ctfd:ctfd -R sslkeys
 
 The four .pem files should appear here. If they're differently named, edit the nginx conf.
+
+## Update repo
+
+```bash
+git remote add upstream git@github.com:CTFd/CTFd.git
+git fetch upstream
+git merge upstream/master
+```
 
 ## What is CTFd?
 
