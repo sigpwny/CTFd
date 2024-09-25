@@ -13,3 +13,6 @@
 [submodule "CTFd/plugins/ctfd-collaboration-plugin"]
 	path = CTFd/plugins/ctfd-collaboration-plugin
 	url = git@github.com:sigpwny/ctfd-collaboration-plugin.git
+[submodule "CTFd/plugins/ctfd-csrf-plugin"]
+	path = CTFd/plugins/ctfd-csrf-plugin
+	url = git@github.com:sigpwny/ctfd-csrf-plugin.git
