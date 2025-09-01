@@ -76,6 +76,8 @@ sudo chown ctfd:ctfd -R sslkeys
 
 The four .pem files should appear here. If they're differently named, edit the nginx conf.
 
+Note: for the latest certbot it seems to generate cert1.pem, fullchain1.pem, keys1.pem, etc. Make sure you use fullchain1.pem as cert.pem to avoid imtermediate certificate missing issue. When that issue occurs, the browser will use TLS fine, but python scripts might fail to validate SSL.
+
 ## Update repo
 
 ```bash
