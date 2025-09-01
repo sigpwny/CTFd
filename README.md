@@ -59,25 +59,39 @@ docker-compose up
 How to update SSL certs:
 
 docker run -p 80:80 --volume="/home/ctfd/CTFd/sslkeys:/sslkeys:rw" -it ubuntu:latest bash
+
 apt-get update
+
 apt-get install certbot
+
 y
+
 2
+
 37
+
 certbot certonly
+
 1
+
 sigpwny@gmail.com
-A
+
+Y
+
 N
+
 ctf.sigpwny.com
+
 cp /etc/letsencrypt/archive/ctf.sigpwny.com/* /sslkeys
+
 exit
+
 sudo chown ctfd:ctfd -R sslkeys
 
 The four .pem files should appear here. If they're differently named, edit the nginx conf.
 
 Note: for the latest certbot it seems to generate cert1.pem, fullchain1.pem, keys1.pem, etc. Make sure you use fullchain1.pem as cert.pem to avoid imtermediate certificate missing issue. When that issue occurs, the browser will use TLS fine, but python scripts might fail to validate SSL.
-
+Also as of 2025/08/31, the above instructions may be out of date. USE YOUR BEST JUDGEMENT.
 ## Update repo
 
 ```bash
