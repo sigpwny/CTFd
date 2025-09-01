@@ -7,7 +7,7 @@ from CTFd.models import Brackets, UserFieldEntries, UserFields, Users, ma
 from CTFd.schemas.fields import UserFieldEntriesSchema
 from CTFd.utils import get_config, string_types
 from CTFd.utils.crypto import verify_password
-from CTFd.utils.email import check_email_is_whitelisted
+from CTFd.utils.email import check_email_is_blacklisted, check_email_is_whitelisted
 from CTFd.utils.user import get_current_user, is_admin
 from CTFd.utils.validators import validate_country_code, validate_language
 
@@ -155,6 +155,11 @@ class UserSchema(ma.ModelSchema):
                         "Email address is not from an allowed domain",
                         field_names=["email"],
                     )
+                if check_email_is_blacklisted(email) is True:
+                    raise ValidationError(
+                        "Email address is not from an allowed domain",
+                        field_names=["email"],
+                    )
                 if get_config("verify_emails"):
                     current_user.verified = False
 
@@ -167,18 +172,23 @@ class UserSchema(ma.ModelSchema):
         if is_admin():
             pass
         else:
+            # If the user has no password set, allow them to set their password
+            if target_user.password is None:
+                return
+
             if password and (bool(confirm) is False):
                 raise ValidationError(
                     "Please confirm your current password", field_names=["confirm"]
                 )
 
-            if target_user.password is None:
-                # Prevent password from being set but allow other data through
-                data.pop("password", None)
-                data.pop("confirm", None)
-                return
-
             if password and confirm:
+                password_min_length = int(get_config("password_min_length", default=0))
+                if len(password) < password_min_length:
+                    raise ValidationError(
+                        f"Password must be at least {password_min_length} characters",
+                        field_names=["password"],
+                    )
+
                 test = verify_password(
                     plaintext=confirm, ciphertext=target_user.password
                 )
@@ -195,6 +205,7 @@ class UserSchema(ma.ModelSchema):
     @pre_load
     def validate_bracket_id(self, data):
         bracket_id = data.get("bracket_id")
+
         if bracket_id is None:
             return
 
@@ -370,6 +381,7 @@ class UserSchema(ma.ModelSchema):
             "password",
             "type",
             "verified",
+            "change_password",
             "fields",
             "team_id",
         ],

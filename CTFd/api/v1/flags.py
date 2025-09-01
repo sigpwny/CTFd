@@ -96,6 +96,11 @@ class FlagList(Resource):
         if response.errors:
             return {"success": False, "errors": response.errors}, 400
 
+        # We only want to operate on flag types where are have
+        # high confidence a leading/trailing space was not intentional
+        if response.data.type in ("static", "regex"):
+            response.data.content = response.data.content.strip()
+
         db.session.add(response.data)
         db.session.commit()
 
@@ -105,24 +110,27 @@ class FlagList(Resource):
         return {"success": True, "data": response.data}
 
 
-@flags_namespace.route("/types", defaults={"type_name": None})
-@flags_namespace.route("/types/<type_name>")
+@flags_namespace.route("/types")
 class FlagTypes(Resource):
     @admins_only
+    def get(self):
+        response = {}
+        for class_id in FLAG_CLASSES:
+            flag_class = FLAG_CLASSES.get(class_id)
+            response[class_id] = {
+                "name": flag_class.name,
+                "templates": flag_class.templates,
+            }
+        return {"success": True, "data": response}
+
+
+@flags_namespace.route("/types/<type_name>")
+class FlagType(Resource):
+    @admins_only
     def get(self, type_name):
-        if type_name:
-            flag_class = get_flag_class(type_name)
-            response = {"name": flag_class.name, "templates": flag_class.templates}
-            return {"success": True, "data": response}
-        else:
-            response = {}
-            for class_id in FLAG_CLASSES:
-                flag_class = FLAG_CLASSES.get(class_id)
-                response[class_id] = {
-                    "name": flag_class.name,
-                    "templates": flag_class.templates,
-                }
-            return {"success": True, "data": response}
+        flag_class = get_flag_class(type_name)
+        response = {"name": flag_class.name, "templates": flag_class.templates}
+        return {"success": True, "data": response}
 
 
 @flags_namespace.route("/<flag_id>")
@@ -179,6 +187,11 @@ class Flag(Resource):
         flag = Flags.query.filter_by(id=flag_id).first_or_404()
         schema = FlagSchema()
         req = request.get_json()
+
+        # We only want to operate on flag types where are have
+        # high confidence a leading/trailing space was not intentional
+        if flag.type in ("static", "regex") and req.get("content"):
+            req["content"] = req["content"].strip()
 
         response = schema.load(req, session=db.session, instance=flag, partial=True)
 

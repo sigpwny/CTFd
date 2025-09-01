@@ -34,6 +34,18 @@
 	</div>
 	{% endblock %}
 
+	{% block attribution %}
+	<div class="form-group">
+		<label>
+			Attribution:<br>
+			<small class="form-text text-muted">
+				Attribution for your challenge <small>(supports markdown)</small>
+			</small>
+		</label>
+		<input type="text" class="form-control" name="attribution" value="{{ challenge.attribution }}">
+	</div>
+	{% endblock %}
+
 	{% block connection_info %}
 	<div class="form-group">
 		<label>
@@ -55,6 +67,21 @@
 			</small>
 		</label>
 		<input type="number" class="form-control chal-value" name="value" value="{{ challenge.value }}" required>
+	</div>
+	{% endblock %}
+
+	{% block logic %}
+	<div class="form-group">
+		<label>
+			Logic<br>
+			<small class="form-text text-muted">Determines how this challenge is solved</small>
+		</label>
+
+		<select class="form-control custom-select" name="logic">
+			<option value="any" {% if challenge.logic == "any" or not challenge.logic %}selected{% endif %}>Require Any Flag</option>
+			<option value="all" {% if challenge.logic == "all" %}selected{% endif %}>Require All Flags</option>
+			<option value="team" {% if challenge.logic == "team" %}selected{% endif %}>Require Any Flags by All Team Members</option>
+		</select>
 	</div>
 	{% endblock %}
 

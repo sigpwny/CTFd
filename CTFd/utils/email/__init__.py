@@ -1,45 +1,28 @@
 from flask import url_for
 
+from CTFd.constants.email import (
+    DEFAULT_PASSWORD_CHANGE_ALERT_BODY,
+    DEFAULT_PASSWORD_CHANGE_ALERT_SUBJECT,
+    DEFAULT_PASSWORD_RESET_BODY,
+    DEFAULT_PASSWORD_RESET_SUBJECT,
+    DEFAULT_SUCCESSFUL_REGISTRATION_EMAIL_BODY,
+    DEFAULT_SUCCESSFUL_REGISTRATION_EMAIL_SUBJECT,
+    DEFAULT_USER_CREATION_EMAIL_BODY,
+    DEFAULT_USER_CREATION_EMAIL_SUBJECT,
+    DEFAULT_VERIFICATION_EMAIL_BODY,
+    DEFAULT_VERIFICATION_EMAIL_SUBJECT,
+)
 from CTFd.utils import get_config
 from CTFd.utils.config import get_mail_provider
 from CTFd.utils.email.providers.mailgun import MailgunEmailProvider
 from CTFd.utils.email.providers.smtp import SMTPEmailProvider
 from CTFd.utils.formatters import safe_format
-from CTFd.utils.security.signing import serialize
+from CTFd.utils.security.email import (
+    generate_email_confirm_token,
+    generate_password_reset_token,
+)
 
 PROVIDERS = {"smtp": SMTPEmailProvider, "mailgun": MailgunEmailProvider}
-
-DEFAULT_VERIFICATION_EMAIL_SUBJECT = "Confirm your account for {ctf_name}"
-DEFAULT_VERIFICATION_EMAIL_BODY = (
-    "Welcome to {ctf_name}!\n\n"
-    "Click the following link to confirm and activate your account:\n"
-    "{url}"
-    "\n\n"
-    "If the link is not clickable, try copying and pasting it into your browser."
-)
-DEFAULT_SUCCESSFUL_REGISTRATION_EMAIL_SUBJECT = "Successfully registered for {ctf_name}"
-DEFAULT_SUCCESSFUL_REGISTRATION_EMAIL_BODY = (
-    "You've successfully registered for {ctf_name}!"
-)
-DEFAULT_USER_CREATION_EMAIL_SUBJECT = "Message from {ctf_name}"
-DEFAULT_USER_CREATION_EMAIL_BODY = (
-    "A new account has been created for you for {ctf_name} at {url}. \n\n"
-    "Username: {name}\n"
-    "Password: {password}"
-)
-DEFAULT_PASSWORD_RESET_SUBJECT = "Password Reset Request from {ctf_name}"
-DEFAULT_PASSWORD_RESET_BODY = (
-    "Did you initiate a password reset on {ctf_name}? "
-    "If you didn't initiate this request you can ignore this email. \n\n"
-    "Click the following link to reset your password:\n{url}\n\n"
-    "If the link is not clickable, try copying and pasting it into your browser."
-)
-DEFAULT_PASSWORD_CHANGE_ALERT_SUBJECT = "Password Change Confirmation for {ctf_name}"
-DEFAULT_PASSWORD_CHANGE_ALERT_BODY = (
-    "Your password for {ctf_name} has been changed.\n\n"
-    "If you didn't request a password change you can reset your password here:\n{url}\n\n"
-    "If the link is not clickable, try copying and pasting it into your browser."
-)
 
 
 def sendmail(addr, text, subject="Message from {ctf_name}"):
@@ -72,7 +55,11 @@ def forgot_password(email):
         get_config("password_reset_body") or DEFAULT_PASSWORD_RESET_BODY,
         ctf_name=get_config("ctf_name"),
         ctf_description=get_config("ctf_description"),
-        url=url_for("auth.reset_password", data=serialize(email), _external=True),
+        url=url_for(
+            "auth.reset_password",
+            data=generate_password_reset_token(email),
+            _external=True,
+        ),
     )
 
     subject = safe_format(
@@ -88,7 +75,10 @@ def verify_email_address(addr):
         ctf_name=get_config("ctf_name"),
         ctf_description=get_config("ctf_description"),
         url=url_for(
-            "auth.confirm", data=serialize(addr), _external=True, _method="GET"
+            "auth.confirm",
+            data=generate_email_confirm_token(addr),
+            _external=True,
+            _method="GET",
         ),
     )
 
@@ -160,3 +150,31 @@ def check_email_is_whitelisted(email_address):
 
     # whitelist is not specified - allow all emails
     return True
+
+
+def check_email_is_blacklisted(email_address):
+    local_id, _, domain = email_address.partition("@")
+    domain_blacklist = get_config("domain_blacklist")
+
+    if domain_blacklist:
+        domain_blacklist = [d.strip() for d in domain_blacklist.split(",")]
+
+        for disallowed_domain in domain_blacklist:
+            if disallowed_domain.startswith("*."):
+                # domains should never container the "*" char
+                if "*" in domain:
+                    return True
+
+                # Handle wildcard domain case
+                suffix = disallowed_domain[1:]  # Remove the "*" prefix
+                if domain.endswith(suffix):
+                    return True
+
+            elif domain == disallowed_domain:
+                return True
+
+        # blacklist is specified but the email is not blacklisted
+        return False
+
+    # blacklist is not specified - no emails are blacklisted
+    return False

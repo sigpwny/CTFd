@@ -19,6 +19,7 @@ from CTFd.api.v1.schemas import (
 )
 from CTFd.api.v1.scoreboard import scoreboard_namespace
 from CTFd.api.v1.shares import shares_namespace
+from CTFd.api.v1.solutions import solutions_namespace
 from CTFd.api.v1.statistics import statistics_namespace
 from CTFd.api.v1.submissions import submissions_namespace
 from CTFd.api.v1.tags import tags_namespace
@@ -40,14 +41,8 @@ CTFd_API_v1 = Api(
             "name": "Authorization",
             "description": "Generate access token in the settings page of your user account.",
         },
-        "ContentType": {
-            "type": "apiKey",
-            "in": "header",
-            "name": "Content-Type",
-            "description": "Must be set to `application/json`",
-        },
     },
-    security=["AccessToken", "ContentType"],
+    security=["AccessToken"],
 )
 
 CTFd_API_v1.schema_model("APISimpleErrorResponse", APISimpleErrorResponse.schema())
@@ -77,3 +72,4 @@ CTFd_API_v1.add_namespace(comments_namespace, "/comments")
 CTFd_API_v1.add_namespace(shares_namespace, "/shares")
 CTFd_API_v1.add_namespace(brackets_namespace, "/brackets")
 CTFd_API_v1.add_namespace(exports_namespace, "/exports")
+CTFd_API_v1.add_namespace(solutions_namespace, "/solutions")
